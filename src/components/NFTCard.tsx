@@ -69,6 +69,7 @@ const NFTCard: React.FC<NFTCardProps> = ({
         rarity={nft.rarity} 
         className="w-full max-w-xs mx-auto"
         onClick={onSelect}
+        showLikes={true}
       >
         <div className="relative">
           <div className="relative aspect-square overflow-hidden">
@@ -87,7 +88,7 @@ const NFTCard: React.FC<NFTCardProps> = ({
           
           <div className="p-4">
             <div className="flex justify-between items-start mb-2">
-              <h3 className="text-lg font-bold text-white">{nft.name}</h3>
+              <h3 className="text-lg font-bold text-[var(--text-color)]">{nft.name}</h3>
               <span className={`text-sm font-medium ${rarityColors[nft.rarity]}`}>
                 {nft.rarity.charAt(0).toUpperCase() + nft.rarity.slice(1)}
               </span>

@@ -6,9 +6,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import NFTCard from '@/components/NFTCard';
 import Card from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const Profile = () => {
   const { currentUser, nfts, cards } = useCardContext();
+  const { language } = useTheme();
   const [activeTab, setActiveTab] = useState("gifts");
   const [likes, setLikes] = useState(currentUser.likes);
   const [dislikes, setDislikes] = useState(currentUser.dislikes);
@@ -49,7 +51,7 @@ const Profile = () => {
       <div className="max-w-4xl mx-auto">
         <div className="glass-card rounded-xl p-6 mb-8">
           <div className="flex flex-col md:flex-row items-center gap-6">
-            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-purple/30">
+            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[var(--accent-color)]/30">
               <img 
                 src={currentUser.avatar || "https://via.placeholder.com/128"}
                 alt={currentUser.name}
@@ -58,7 +60,7 @@ const Profile = () => {
             </div>
             
             <div className="flex-1 text-center md:text-left">
-              <h1 className="text-3xl font-bold text-white mb-2">{currentUser.name}</h1>
+              <h1 className="text-3xl font-bold text-[var(--text-color)] mb-2">{currentUser.name}</h1>
               <p className="text-gray-300 mb-4">{currentUser.description}</p>
               
               <div className="flex items-center justify-center md:justify-start space-x-4">
@@ -86,18 +88,18 @@ const Profile = () => {
           <TabsList className="grid grid-cols-2 mb-8">
             <TabsTrigger value="gifts" className="flex items-center gap-2">
               <Gift size={16} />
-              <span>Подарки/NFT</span>
+              <span>{language === 'ru' ? 'Подарки/NFT' : 'Gifts/NFT'}</span>
             </TabsTrigger>
             <TabsTrigger value="cards" className="flex items-center gap-2">
               <CreditCard size={16} />
-              <span>Карточки</span>
+              <span>{language === 'ru' ? 'Карточки' : 'Cards'}</span>
             </TabsTrigger>
           </TabsList>
           
           <TabsContent value="gifts" className="animate-fade-in">
             {nfts.length === 0 ? (
               <div className="text-center py-10">
-                <p className="text-gray-400">У вас нет подарков и NFT</p>
+                <p className="text-gray-400">{language === 'ru' ? 'У вас нет подарков и NFT' : 'You have no gifts or NFTs'}</p>
               </div>
             ) : (
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -115,7 +117,7 @@ const Profile = () => {
           <TabsContent value="cards" className="animate-fade-in">
             {cards.length === 0 ? (
               <div className="text-center py-10">
-                <p className="text-gray-400">У вас нет обычных карточек</p>
+                <p className="text-gray-400">{language === 'ru' ? 'У вас нет обычных карточек' : 'You have no regular cards'}</p>
               </div>
             ) : (
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -124,6 +126,7 @@ const Profile = () => {
                     key={card.id} 
                     rarity={card.rarity}
                     onClick={() => setSelectedItem(card.id)}
+                    showLikes={true}
                   >
                     <div className="aspect-square overflow-hidden">
                       <img 
@@ -133,7 +136,7 @@ const Profile = () => {
                       />
                     </div>
                     <div className="p-4">
-                      <h3 className="text-lg font-bold text-white mb-2">{card.name}</h3>
+                      <h3 className="text-lg font-bold text-[var(--text-color)] mb-2">{card.name}</h3>
                       <p className="text-gray-300 text-sm line-clamp-2">{card.description}</p>
                     </div>
                   </Card>
@@ -160,13 +163,13 @@ const Profile = () => {
             </div>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-300">Редкость:</span>
+                <span className="text-sm font-medium text-gray-300">{language === 'ru' ? 'Редкость:' : 'Rarity:'}</span>
                 <span className={`text-sm font-bold text-rarity-${selectedData.rarity}`}>
                   {selectedData.rarity.charAt(0).toUpperCase() + selectedData.rarity.slice(1)}
                 </span>
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white mb-1">Описание</h3>
+                <h3 className="text-lg font-bold text-[var(--text-color)] mb-1">{language === 'ru' ? 'Описание' : 'Description'}</h3>
                 <p className="text-gray-300">{selectedData.description}</p>
               </div>
             </div>

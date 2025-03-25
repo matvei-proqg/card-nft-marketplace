@@ -24,7 +24,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <div className="min-h-screen bg-dark">
+            <div className="min-h-screen bg-[var(--background-color)] text-[var(--text-color)] transition-colors duration-300">
               <Header />
               <Routes>
                 <Route path="/" element={<Index />} />
