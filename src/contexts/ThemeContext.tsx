@@ -12,14 +12,37 @@ interface ThemeContextType {
   setTheme: (theme: ThemeType) => void;
   setAccentColor: (color: AccentColor) => void;
   setLanguage: (lang: Language) => void;
+  toggleTheme: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [theme, setTheme] = useState<ThemeType>('dark');
-  const [accentColor, setAccentColor] = useState<AccentColor>('purple');
-  const [language, setLanguage] = useState<Language>('ru');
+  const [theme, setTheme] = useState<ThemeType>(() => {
+    const savedTheme = localStorage.getItem('theme');
+    return (savedTheme as ThemeType) || 'dark';
+  });
+  
+  const [accentColor, setAccentColor] = useState<AccentColor>(() => {
+    const savedColor = localStorage.getItem('accentColor');
+    return (savedColor as AccentColor) || 'purple';
+  });
+  
+  const [language, setLanguage] = useState<Language>(() => {
+    const savedLanguage = localStorage.getItem('language');
+    return (savedLanguage as Language) || 'ru';
+  });
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
+  // Save preferences to localStorage
+  useEffect(() => {
+    localStorage.setItem('theme', theme);
+    localStorage.setItem('accentColor', accentColor);
+    localStorage.setItem('language', language);
+  }, [theme, accentColor, language]);
 
   // Apply theme and accent color classes to document element
   useEffect(() => {
@@ -42,7 +65,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
       document.documentElement.style.setProperty('--text-color', '#121212');
     }
     
-    // Set accent color variable
+    // Set accent color variable based on the selected color
     const accentColorValues = {
       purple: '#8B5CF6',
       blue: '#3B82F6',
@@ -50,7 +73,13 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
       red: '#EF4444',
       yellow: '#F59E0B'
     };
+    
     document.documentElement.style.setProperty('--accent-color', accentColorValues[accentColor]);
+    
+    // Update CSS custom properties for components
+    document.documentElement.style.setProperty('--primary', accentColorValues[accentColor]);
+    document.documentElement.style.setProperty('--card-bg', theme === 'dark' ? '#1A1A1A' : '#ffffff');
+    document.documentElement.style.setProperty('--card-border', theme === 'dark' ? '#333333' : '#e5e7eb');
   }, [theme, accentColor]);
 
   return (
@@ -62,6 +91,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         setTheme,
         setAccentColor,
         setLanguage,
+        toggleTheme,
       }}
     >
       {children}

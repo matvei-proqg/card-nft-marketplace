@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
@@ -18,14 +19,56 @@ const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const baseClasses = 'inline-flex items-center justify-center rounded-md font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple disabled:opacity-50 disabled:cursor-not-allowed';
+  const { theme, accentColor } = useTheme();
+  
+  const baseClasses = 'inline-flex items-center justify-center rounded-md font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
 
+  // Dynamic accent color mapping
+  const accentMapping = {
+    purple: {
+      bg: 'bg-purple hover:bg-purple-dark',
+      border: 'border-purple/50',
+      ring: 'focus:ring-purple',
+      shadow: 'shadow-purple/20'
+    },
+    blue: {
+      bg: 'bg-blue-500 hover:bg-blue-600',
+      border: 'border-blue-500/50',
+      ring: 'focus:ring-blue-500',
+      shadow: 'shadow-blue-500/20'
+    },
+    green: {
+      bg: 'bg-emerald-500 hover:bg-emerald-600',
+      border: 'border-emerald-500/50',
+      ring: 'focus:ring-emerald-500',
+      shadow: 'shadow-emerald-500/20'
+    },
+    red: {
+      bg: 'bg-red-500 hover:bg-red-600',
+      border: 'border-red-500/50',
+      ring: 'focus:ring-red-500',
+      shadow: 'shadow-red-500/20'
+    },
+    yellow: {
+      bg: 'bg-amber-500 hover:bg-amber-600',
+      border: 'border-amber-500/50',
+      ring: 'focus:ring-amber-500',
+      shadow: 'shadow-amber-500/20'
+    }
+  };
+  
+  const currentAccent = accentMapping[accentColor];
+  
+  const themeClasses = theme === 'dark' 
+    ? 'text-white' 
+    : 'text-gray-800';
+  
   const variants = {
-    primary: 'bg-purple hover:bg-purple-dark text-white shadow-lg shadow-purple/20',
-    secondary: 'bg-dark-lighter border border-purple/50 text-white hover:bg-dark-light',
-    ghost: 'bg-transparent text-white hover:bg-white/10',
+    primary: `${currentAccent.bg} ${themeClasses} shadow-lg ${currentAccent.shadow}`,
+    secondary: `${theme === 'dark' ? 'bg-dark-lighter' : 'bg-gray-200'} border ${currentAccent.border} text-${theme === 'dark' ? 'white' : 'gray-800'} hover:${theme === 'dark' ? 'bg-dark-light' : 'bg-gray-300'}`,
+    ghost: `bg-transparent text-${theme === 'dark' ? 'white' : 'gray-800'} hover:${theme === 'dark' ? 'bg-white/10' : 'bg-black/10'}`,
     danger: 'bg-red-600 text-white hover:bg-red-700',
-    success: 'bg-green-600 text-white hover:bg-green-700'
+    success: 'bg-emerald-600 text-white hover:bg-emerald-700'
   };
 
   const sizes = {

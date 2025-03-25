@@ -5,6 +5,7 @@ import Card from './ui/card-custom';
 import Button from './ui/Button';
 import { UserSelectionModal, SellModal, ConfirmationModal } from './ui/Modal';
 import { CardType, useCardContext } from '@/contexts/CardContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface NFTCardProps {
   nft: CardType;
@@ -25,6 +26,8 @@ const NFTCard: React.FC<NFTCardProps> = ({
     buyNFT, 
     giftNFT 
   } = useCardContext();
+  
+  const { theme, language } = useTheme();
   
   const [showGiftModal, setShowGiftModal] = useState(false);
   const [showTradeModal, setShowTradeModal] = useState(false);
@@ -55,13 +58,36 @@ const NFTCard: React.FC<NFTCardProps> = ({
     removeFromSale(nft.id);
   };
 
-  const rarityColors = {
-    common: 'text-rarity-common',
-    uncommon: 'text-rarity-uncommon',
-    rare: 'text-rarity-rare',
-    epic: 'text-rarity-epic',
-    legendary: 'text-rarity-legendary'
+  const translations = {
+    ru: {
+      sell: 'Продать',
+      gift: 'Подарить',
+      trade: 'Обменять',
+      buy: `Купить за ${nft.price} FPI Bank`,
+      removeFromSale: 'Убрать с продажи',
+      confirmBuyTitle: 'Подтверждение покупки',
+      confirmBuyMessage: `Вы уверены, что хотите купить "${nft.name}" за ${nft.price} FPI Bank?`,
+      confirmRemoveTitle: 'Убрать с продажи',
+      confirmRemoveMessage: `Убрать "${nft.name}" с рынка?`,
+      selectGiftTitle: 'Выберите, кому подарить',
+      selectTradeTitle: 'Выберите, с кем обменяться'
+    },
+    en: {
+      sell: 'Sell',
+      gift: 'Gift',
+      trade: 'Trade',
+      buy: `Buy for ${nft.price} FPI Bank`,
+      removeFromSale: 'Remove from sale',
+      confirmBuyTitle: 'Confirm Purchase',
+      confirmBuyMessage: `Are you sure you want to buy "${nft.name}" for ${nft.price} FPI Bank?`,
+      confirmRemoveTitle: 'Remove from Sale',
+      confirmRemoveMessage: `Remove "${nft.name}" from the marketplace?`,
+      selectGiftTitle: 'Select recipient',
+      selectTradeTitle: 'Select trade partner'
+    }
   };
+
+  const t = translations[language];
 
   return (
     <>
@@ -79,7 +105,7 @@ const NFTCard: React.FC<NFTCardProps> = ({
               className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
             />
             <button 
-              className="absolute top-3 right-3 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+              className={`absolute top-3 right-3 p-2 rounded-full ${theme === 'dark' ? 'bg-black/50 text-white hover:bg-black/70' : 'bg-white/70 text-gray-800 hover:bg-white/90'} transition-colors`}
               onClick={handleFavoriteToggle}
             >
               <Heart size={20} className={nft.favorite ? 'fill-red-500 text-red-500' : ''} />
@@ -88,12 +114,14 @@ const NFTCard: React.FC<NFTCardProps> = ({
           
           <div className="p-4">
             <div className="flex justify-between items-start mb-2">
-              <h3 className="text-lg font-bold text-[var(--text-color)]">{nft.name}</h3>
-              <span className={`text-sm font-medium ${rarityColors[nft.rarity]}`}>
+              <h3 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{nft.name}</h3>
+              <span className={`text-sm font-medium text-rarity-${nft.rarity}`}>
                 {nft.rarity.charAt(0).toUpperCase() + nft.rarity.slice(1)}
               </span>
             </div>
-            <p className="text-gray-300 text-sm mb-4 line-clamp-2">{nft.description}</p>
+            <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} text-sm mb-4 line-clamp-2`}>
+              {nft.description}
+            </p>
             
             {isMarketplace ? (
               <div className="space-y-2">
@@ -106,7 +134,7 @@ const NFTCard: React.FC<NFTCardProps> = ({
                       setShowRemoveFromSaleModal(true);
                     }}
                   >
-                    Убрать с продажи
+                    {t.removeFromSale}
                   </Button>
                 ) : (
                   <Button 
@@ -116,7 +144,7 @@ const NFTCard: React.FC<NFTCardProps> = ({
                       setShowConfirmBuyModal(true);
                     }}
                   >
-                    Купить за {nft.price} FPI Bank
+                    {t.buy}
                   </Button>
                 )}
               </div>
@@ -131,7 +159,7 @@ const NFTCard: React.FC<NFTCardProps> = ({
                       setShowSellModal(true);
                     }}
                   >
-                    Продать
+                    {t.sell}
                   </Button>
                   <Button 
                     variant="secondary" 
@@ -141,7 +169,7 @@ const NFTCard: React.FC<NFTCardProps> = ({
                       setShowGiftModal(true);
                     }}
                   >
-                    Подарить
+                    {t.gift}
                   </Button>
                   <Button 
                     variant="secondary" 
@@ -151,7 +179,7 @@ const NFTCard: React.FC<NFTCardProps> = ({
                       setShowTradeModal(true);
                     }}
                   >
-                    Обменять
+                    {t.trade}
                   </Button>
                 </div>
               )
@@ -163,14 +191,14 @@ const NFTCard: React.FC<NFTCardProps> = ({
       <UserSelectionModal
         isOpen={showGiftModal}
         onClose={() => setShowGiftModal(false)}
-        title="Выберите, кому подарить"
+        title={t.selectGiftTitle}
         onSelectUser={handleGift}
       />
 
       <UserSelectionModal
         isOpen={showTradeModal}
         onClose={() => setShowTradeModal(false)}
-        title="Выберите, с кем обменяться"
+        title={t.selectTradeTitle}
         onSelectUser={(userId) => console.log('Trade request sent to:', userId)}
       />
 
@@ -183,16 +211,16 @@ const NFTCard: React.FC<NFTCardProps> = ({
       <ConfirmationModal
         isOpen={showConfirmBuyModal}
         onClose={() => setShowConfirmBuyModal(false)}
-        title="Подтверждение покупки"
-        message={`Вы уверены, что хотите купить "${nft.name}" за ${nft.price} FPI Bank?`}
+        title={t.confirmBuyTitle}
+        message={t.confirmBuyMessage}
         onConfirm={handleBuy}
       />
 
       <ConfirmationModal
         isOpen={showRemoveFromSaleModal}
         onClose={() => setShowRemoveFromSaleModal(false)}
-        title="Убрать с продажи"
-        message={`Убрать "${nft.name}" с рынка?`}
+        title={t.confirmRemoveTitle}
+        message={t.confirmRemoveMessage}
         onConfirm={handleRemoveFromSale}
       />
     </>
