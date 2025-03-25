@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Heart } from 'lucide-react';
-import Card from './ui/Card';
+import Card from './ui/card-custom';
 import Button from './ui/Button';
 import { UserSelectionModal, SellModal, ConfirmationModal } from './ui/Modal';
 import { CardType, useCardContext } from '@/contexts/CardContext';
@@ -116,7 +116,7 @@ const NFTCard: React.FC<NFTCardProps> = ({
                       setShowConfirmBuyModal(true);
                     }}
                   >
-                    Купить за {nft.price} ETH
+                    Купить за {nft.price} FPI Bank
                   </Button>
                 )}
               </div>
@@ -184,7 +184,7 @@ const NFTCard: React.FC<NFTCardProps> = ({
         isOpen={showConfirmBuyModal}
         onClose={() => setShowConfirmBuyModal(false)}
         title="Подтверждение покупки"
-        message={`Вы уверены, что хотите купить "${nft.name}" за ${nft.price} ETH?`}
+        message={`Вы уверены, что хотите купить "${nft.name}" за ${nft.price} FPI Bank?`}
         onConfirm={handleBuy}
       />
 

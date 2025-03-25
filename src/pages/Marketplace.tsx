@@ -3,12 +3,22 @@ import React, { useState } from 'react';
 import NFTCard from '@/components/NFTCard';
 import { useCardContext } from '@/contexts/CardContext';
 import { Modal } from '@/components/ui/Modal';
+import Button from '@/components/ui/Button';
 
 const Marketplace = () => {
-  const { marketplaceItems } = useCardContext();
+  const { marketplaceItems, currentUser, removeFromSale } = useCardContext();
   const [selectedNFT, setSelectedNFT] = useState<string | null>(null);
   
   const selectedNFTData = marketplaceItems.find(nft => nft.id === selectedNFT);
+
+  const handleRemoveFromSale = () => {
+    if (selectedNFTData) {
+      removeFromSale(selectedNFTData.id);
+      setSelectedNFT(null);
+    }
+  };
+
+  const isOwner = selectedNFTData ? selectedNFTData.owner === currentUser.id : false;
 
   return (
     <div className="page-container page-transition pt-20">
@@ -58,7 +68,7 @@ const Marketplace = () => {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-300">Цена:</span>
-                <span className="text-sm font-bold text-white">{selectedNFTData.price} ETH</span>
+                <span className="text-sm font-bold text-white">{selectedNFTData.price} FPI Bank</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-300">Редкость:</span>
@@ -69,6 +79,38 @@ const Marketplace = () => {
               <div>
                 <h3 className="text-lg font-bold text-white mb-1">Описание</h3>
                 <p className="text-gray-300">{selectedNFTData.description}</p>
+              </div>
+              
+              <div className="pt-4">
+                {isOwner ? (
+                  <Button 
+                    variant="secondary" 
+                    className="w-full"
+                    onClick={handleRemoveFromSale}
+                  >
+                    Убрать с продажи
+                  </Button>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button 
+                      className="w-full"
+                      onClick={() => {
+                        if (selectedNFTData) {
+                          useCardContext().buyNFT(selectedNFTData.id);
+                          setSelectedNFT(null);
+                        }
+                      }}
+                    >
+                      Купить за {selectedNFTData.price} FPI Bank
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => setSelectedNFT(null)}
+                    >
+                      Отмена
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

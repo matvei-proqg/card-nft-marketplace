@@ -167,7 +167,7 @@ export const SellModal: React.FC<SellModalProps> = ({
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-300 mb-1">
-            Цена (ETH)
+            Цена (FPI Bank)
           </label>
           <input
             type="number"

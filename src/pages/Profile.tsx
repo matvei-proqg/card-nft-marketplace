@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { useCardContext } from '@/contexts/CardContext';
 import { ThumbsUp, ThumbsDown, Gift, CreditCard } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import NFTCard from '@/components/NFTCard';
-import Card from '@/components/ui/Card';
+import Card from '@/components/ui/card-custom';
 import { Modal } from '@/components/ui/Modal';
 import { useTheme } from '@/contexts/ThemeContext';
 
