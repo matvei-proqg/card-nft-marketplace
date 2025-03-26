@@ -1,11 +1,23 @@
+
 import React, { useState } from 'react';
-import { useCardContext } from '@/contexts/CardContext';
-import { ThumbsUp, ThumbsDown, Gift, CreditCard } from 'lucide-react';
+import { useCardContext, CardType } from '@/contexts/CardContext';
+import { ThumbsUp, ThumbsDown, Gift, CreditCard, ArrowUpAZ, ArrowDownAZ } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import NFTCard from '@/components/NFTCard';
 import Card from '@/components/ui/card-custom';
 import { Modal } from '@/components/ui/Modal';
 import { useTheme } from '@/contexts/ThemeContext';
+import { Button } from '@/components/ui/Button';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
+
+type SortField = 'name' | 'rarity';
+type SortDirection = 'asc' | 'desc';
 
 const Profile = () => {
   const { currentUser, nfts, cards } = useCardContext();
@@ -16,6 +28,8 @@ const Profile = () => {
   const [hasLiked, setHasLiked] = useState(false);
   const [hasDisliked, setHasDisliked] = useState(false);
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
+  const [sortField, setSortField] = useState<SortField>('rarity');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   
   const selectedNFT = nfts.find(nft => nft.id === selectedItem);
   const selectedCard = cards.find(card => card.id === selectedItem);
@@ -44,6 +58,57 @@ const Profile = () => {
     setDislikes(prev => prev + 1);
     setHasDisliked(true);
   };
+
+  const sortItems = (items: CardType[]): CardType[] => {
+    const rarityOrder = { legendary: 5, epic: 4, rare: 3, uncommon: 2, common: 1 };
+    
+    return [...items].sort((a, b) => {
+      if (sortField === 'name') {
+        return sortDirection === 'asc' 
+          ? a.name.localeCompare(b.name)
+          : b.name.localeCompare(a.name);
+      } else if (sortField === 'rarity') {
+        return sortDirection === 'asc'
+          ? rarityOrder[a.rarity] - rarityOrder[b.rarity]
+          : rarityOrder[b.rarity] - rarityOrder[a.rarity];
+      }
+      return 0;
+    });
+  };
+
+  const sortedNFTs = sortItems(nfts);
+  const sortedCards = sortItems(cards);
+
+  const translations = {
+    ru: {
+      gifts: 'Подарки/NFT',
+      cards: 'Карточки',
+      noGifts: 'У вас нет подарков и NFT',
+      noCards: 'У вас нет обычных карточек',
+      sortBy: 'Сортировать по',
+      name: 'Названию',
+      rarity: 'Редкости',
+      ascending: 'По возрастанию',
+      descending: 'По убыванию',
+      rarityLabel: 'Редкость:',
+      description: 'Описание'
+    },
+    en: {
+      gifts: 'Gifts/NFT',
+      cards: 'Cards',
+      noGifts: 'You have no gifts or NFTs',
+      noCards: 'You have no regular cards',
+      sortBy: 'Sort by',
+      name: 'Name',
+      rarity: 'Rarity',
+      ascending: 'Ascending',
+      descending: 'Descending',
+      rarityLabel: 'Rarity:',
+      description: 'Description'
+    }
+  };
+
+  const t = translations[language];
 
   return (
     <div className="page-container page-transition pt-20">
@@ -87,22 +152,54 @@ const Profile = () => {
           <TabsList className="grid grid-cols-2 mb-8">
             <TabsTrigger value="gifts" className="flex items-center gap-2">
               <Gift size={16} />
-              <span>{language === 'ru' ? 'Подарки/NFT' : 'Gifts/NFT'}</span>
+              <span>{t.gifts}</span>
             </TabsTrigger>
             <TabsTrigger value="cards" className="flex items-center gap-2">
               <CreditCard size={16} />
-              <span>{language === 'ru' ? 'Карточки' : 'Cards'}</span>
+              <span>{t.cards}</span>
             </TabsTrigger>
           </TabsList>
+          
+          {(nfts.length > 0 || cards.length > 0) && (
+            <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Select 
+                  value={sortField} 
+                  onValueChange={(value) => setSortField(value as SortField)}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder={t.sortBy} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="name">{t.name}</SelectItem>
+                    <SelectItem value="rarity">{t.rarity}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}
+                >
+                  {sortDirection === 'asc' ? <ArrowUpAZ size={18} /> : <ArrowDownAZ size={18} />}
+                </Button>
+                <span className="text-sm text-gray-400">
+                  {sortDirection === 'asc' ? t.ascending : t.descending}
+                </span>
+              </div>
+            </div>
+          )}
           
           <TabsContent value="gifts" className="animate-fade-in">
             {nfts.length === 0 ? (
               <div className="text-center py-10">
-                <p className="text-gray-400">{language === 'ru' ? 'У вас нет подарков и NFT' : 'You have no gifts or NFTs'}</p>
+                <p className="text-gray-400">{t.noGifts}</p>
               </div>
             ) : (
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-                {nfts.map(nft => (
+                {sortedNFTs.map(nft => (
                   <NFTCard 
                     key={nft.id} 
                     nft={nft} 
@@ -116,11 +213,11 @@ const Profile = () => {
           <TabsContent value="cards" className="animate-fade-in">
             {cards.length === 0 ? (
               <div className="text-center py-10">
-                <p className="text-gray-400">{language === 'ru' ? 'У вас нет обычных карточек' : 'You have no regular cards'}</p>
+                <p className="text-gray-400">{t.noCards}</p>
               </div>
             ) : (
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-                {cards.map(card => (
+                {sortedCards.map(card => (
                   <Card 
                     key={card.id} 
                     rarity={card.rarity}
@@ -162,13 +259,13 @@ const Profile = () => {
             </div>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-300">{language === 'ru' ? 'Редкость:' : 'Rarity:'}</span>
+                <span className="text-sm font-medium text-gray-300">{t.rarityLabel}</span>
                 <span className={`text-sm font-bold text-rarity-${selectedData.rarity}`}>
                   {selectedData.rarity.charAt(0).toUpperCase() + selectedData.rarity.slice(1)}
                 </span>
               </div>
               <div>
-                <h3 className="text-lg font-bold text-[var(--text-color)] mb-1">{language === 'ru' ? 'Описание' : 'Description'}</h3>
+                <h3 className="text-lg font-bold text-[var(--text-color)] mb-1">{t.description}</h3>
                 <p className="text-gray-300">{selectedData.description}</p>
               </div>
             </div>

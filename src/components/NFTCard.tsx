@@ -1,11 +1,12 @@
 
 import React, { useState } from 'react';
-import { Heart } from 'lucide-react';
+import { Heart, BadgeInfo } from 'lucide-react';
 import Card from './ui/card-custom';
-import Button from './ui/Button';
+import { Button } from './ui/Button';
 import { UserSelectionModal, SellModal, ConfirmationModal } from './ui/Modal';
 import { CardType, useCardContext } from '@/contexts/CardContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface NFTCardProps {
   nft: CardType;
@@ -28,6 +29,7 @@ const NFTCard: React.FC<NFTCardProps> = ({
   } = useCardContext();
   
   const { theme, language } = useTheme();
+  const { toast } = useToast();
   
   const [showGiftModal, setShowGiftModal] = useState(false);
   const [showTradeModal, setShowTradeModal] = useState(false);
@@ -40,22 +42,46 @@ const NFTCard: React.FC<NFTCardProps> = ({
   const handleFavoriteToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleFavorite(nft.id);
+    toast({
+      title: nft.favorite ? "Removed from favorites" : "Added to favorites",
+      duration: 2000,
+    });
   };
 
   const handleGift = (userId: string) => {
     giftNFT(nft.id, userId);
+    toast({
+      title: "Gift sent successfully!",
+      description: "The NFT has been transferred to the recipient.",
+      duration: 3000,
+    });
   };
 
   const handleSell = (price: number) => {
     putForSale(nft.id, price);
+    toast({
+      title: "NFT listed for sale",
+      description: `Your NFT is now available on the marketplace for ${price} FPI Bank.`,
+      duration: 3000,
+    });
   };
 
   const handleBuy = () => {
     buyNFT(nft.id);
+    toast({
+      title: "Purchase successful!",
+      description: `You now own "${nft.name}"`,
+      duration: 3000,
+    });
   };
 
   const handleRemoveFromSale = () => {
     removeFromSale(nft.id);
+    toast({
+      title: "Removed from marketplace",
+      description: "Your NFT has been removed from sale.",
+      duration: 3000,
+    });
   };
 
   const translations = {
@@ -70,7 +96,8 @@ const NFTCard: React.FC<NFTCardProps> = ({
       confirmRemoveTitle: 'Убрать с продажи',
       confirmRemoveMessage: `Убрать "${nft.name}" с рынка?`,
       selectGiftTitle: 'Выберите, кому подарить',
-      selectTradeTitle: 'Выберите, с кем обменяться'
+      selectTradeTitle: 'Выберите, с кем обменяться',
+      info: 'Информация'
     },
     en: {
       sell: 'Sell',
@@ -83,7 +110,8 @@ const NFTCard: React.FC<NFTCardProps> = ({
       confirmRemoveTitle: 'Remove from Sale',
       confirmRemoveMessage: `Remove "${nft.name}" from the marketplace?`,
       selectGiftTitle: 'Select recipient',
-      selectTradeTitle: 'Select trade partner'
+      selectTradeTitle: 'Select trade partner',
+      info: 'Details'
     }
   };
 
@@ -104,21 +132,41 @@ const NFTCard: React.FC<NFTCardProps> = ({
               alt={nft.name}
               className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
             />
-            <button 
-              className={`absolute top-3 right-3 p-2 rounded-full ${theme === 'dark' ? 'bg-black/50 text-white hover:bg-black/70' : 'bg-white/70 text-gray-800 hover:bg-white/90'} transition-colors`}
-              onClick={handleFavoriteToggle}
-            >
-              <Heart size={20} className={nft.favorite ? 'fill-red-500 text-red-500' : ''} />
-            </button>
-          </div>
-          
-          <div className="p-4">
-            <div className="flex justify-between items-start mb-2">
-              <h3 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{nft.name}</h3>
-              <span className={`text-sm font-medium text-rarity-${nft.rarity}`}>
+            
+            <div className="absolute top-3 right-3 flex gap-2">
+              <button 
+                className={`p-2 rounded-full ${theme === 'dark' ? 'bg-black/50 hover:bg-black/70' : 'bg-white/70 hover:bg-white/90'} transition-colors`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelect && onSelect();
+                }}
+              >
+                <BadgeInfo size={16} className="text-gray-200" />
+              </button>
+              
+              <button 
+                className={`p-2 rounded-full ${theme === 'dark' ? 'bg-black/50 hover:bg-black/70' : 'bg-white/70 hover:bg-white/90'} transition-colors`}
+                onClick={handleFavoriteToggle}
+              >
+                <Heart size={16} className={nft.favorite ? 'fill-red-500 text-red-500' : 'text-gray-200'} />
+              </button>
+            </div>
+            
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
+              <span className={`text-xs font-medium px-2 py-1 rounded-full bg-opacity-80 text-white ${
+                nft.rarity === 'legendary' ? 'bg-yellow-600' : 
+                nft.rarity === 'epic' ? 'bg-purple-600' : 
+                nft.rarity === 'rare' ? 'bg-blue-600' : 
+                nft.rarity === 'uncommon' ? 'bg-green-600' : 
+                'bg-gray-600'
+              }`}>
                 {nft.rarity.charAt(0).toUpperCase() + nft.rarity.slice(1)}
               </span>
             </div>
+          </div>
+          
+          <div className="p-4">
+            <h3 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'} mb-2`}>{nft.name}</h3>
             <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} text-sm mb-4 line-clamp-2`}>
               {nft.description}
             </p>
@@ -127,7 +175,7 @@ const NFTCard: React.FC<NFTCardProps> = ({
               <div className="space-y-2">
                 {isOwner ? (
                   <Button 
-                    variant="secondary" 
+                    variant="outline" 
                     className="w-full"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -138,7 +186,7 @@ const NFTCard: React.FC<NFTCardProps> = ({
                   </Button>
                 ) : (
                   <Button 
-                    className="w-full"
+                    className="w-full group"
                     onClick={(e) => {
                       e.stopPropagation();
                       setShowConfirmBuyModal(true);
@@ -152,7 +200,7 @@ const NFTCard: React.FC<NFTCardProps> = ({
               isOwner && (
                 <div className="grid grid-cols-3 gap-2">
                   <Button 
-                    variant="secondary" 
+                    variant="outline" 
                     size="sm"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -162,7 +210,7 @@ const NFTCard: React.FC<NFTCardProps> = ({
                     {t.sell}
                   </Button>
                   <Button 
-                    variant="secondary" 
+                    variant="outline" 
                     size="sm"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -172,7 +220,7 @@ const NFTCard: React.FC<NFTCardProps> = ({
                     {t.gift}
                   </Button>
                   <Button 
-                    variant="secondary" 
+                    variant="outline" 
                     size="sm"
                     onClick={(e) => {
                       e.stopPropagation();

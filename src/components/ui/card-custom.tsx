@@ -41,8 +41,17 @@ const Card: React.FC<CardProps> = ({
     common: 'before:bg-gradient-to-r before:from-gray-400 before:via-gray-500 before:to-gray-600'
   };
 
+  const rarityColors = {
+    legendary: 'ring-yellow-400',
+    epic: 'ring-purple-400',
+    rare: 'ring-blue-400',
+    uncommon: 'ring-green-400',
+    common: 'ring-gray-400'
+  };
+
   const legendaryClass = rarity === 'legendary' ? 'legendary-glow' : '';
   const rarityGradientClass = rarity ? rarityGradients[rarity] : '';
+  const rarityRingClass = rarity ? rarityColors[rarity] : '';
   const darkModeClass = theme === 'dark' ? 'bg-dark-light/90' : 'bg-white/90';
   const cardBgClass = theme === 'dark' ? 'shadow-[0_4px_12px_-2px_rgba(0,0,0,0.3)]' : 'shadow-lg';
   const textClass = theme === 'dark' ? 'text-white' : 'text-gray-800';
@@ -81,6 +90,9 @@ const Card: React.FC<CardProps> = ({
       className={cn(
         'backdrop-blur-xl rounded-xl overflow-hidden card-hover transition-all duration-300',
         'relative before:absolute before:inset-[-2px] before:rounded-[inherit] before:p-[2px] before:z-[-1]',
+        'transform hover:scale-[1.02] hover:-translate-y-1',
+        'ring-1 ring-white/10',
+        rarity && rarityRingClass,
         darkModeClass,
         cardBgClass,
         rarityGradientClass,
