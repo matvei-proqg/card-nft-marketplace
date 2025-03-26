@@ -1,7 +1,6 @@
-
 import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
-import Button from './Button';
+import { Button } from './Button';
 import { useCardContext } from '@/contexts/CardContext';
 
 interface ModalProps {

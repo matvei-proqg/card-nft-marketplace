@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import Card from '@/components/ui/card-custom';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 import { ConfirmationModal } from '@/components/ui/Modal';
 import { useCardContext } from '@/contexts/CardContext';
 import { useTheme } from '@/contexts/ThemeContext';

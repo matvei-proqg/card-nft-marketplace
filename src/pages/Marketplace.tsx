@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import NFTCard from '@/components/NFTCard';
 import { useCardContext, CardType } from '@/contexts/CardContext';
@@ -75,7 +74,7 @@ const Marketplace = () => {
       cancel: 'Отмена',
       rarityLabel: 'Редкость:',
       priceLabel: 'Цена:',
-      description: 'Описание'
+      descriptionLabel: 'Описание'
     },
     en: {
       title: 'NFT Marketplace',
@@ -93,7 +92,7 @@ const Marketplace = () => {
       cancel: 'Cancel',
       rarityLabel: 'Rarity:',
       priceLabel: 'Price:',
-      description: 'Description'
+      descriptionLabel: 'Description'
     }
   };
 
@@ -193,7 +192,7 @@ const Marketplace = () => {
                 </span>
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white mb-1">{t.description}</h3>
+                <h3 className="text-lg font-bold text-white mb-1">{t.descriptionLabel}</h3>
                 <p className="text-gray-300">{selectedNFTData.description}</p>
               </div>
               

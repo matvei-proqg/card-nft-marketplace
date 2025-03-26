@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Heart, BadgeInfo } from 'lucide-react';
 import Card from './ui/card-custom';
